@@ -9,12 +9,6 @@
 <h4 align="center">Harnessing the Power of LLMs for Enhanced Video Understanding</h4>
 
 <p align="center">
-  <a href="#"><img src="https://img.shields.io/github/issues"></a> 
-  <a href="#"><img src="https://img.shields.io/github/stars"></a>
-  <a href="#"><img src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-</p>
-
-<p align="center">
   <a href="#overview-">Overview</a> •
   <a href="#features-">Features</a> •
   <a href="#getting-started-">Getting Started</a> •
