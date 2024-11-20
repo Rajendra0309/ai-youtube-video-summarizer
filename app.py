@@ -308,7 +308,7 @@ class AIVideoSummarizer:
 
             mode = st.radio(
                 "Choose an option:",
-                [":rainbow[**AI Summary**]", ":rainbow[**AI Timestamps**]", "**Transcript**"],
+                [":rainbow[🪄 AI Summary]", ":rainbow[🎰 AI Timestamps]", "🔤 Transcript"],
                 index=0
             )
             ran_loader = Misc.loaderx()
