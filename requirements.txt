@@ -1,8 +1,9 @@
-streamlit
-google-generativeai
-openai
-youtube_transcript_api
-python-dotenv
-beautifulsoup4
-st-copy-to-clipboard
-strip-markdown
+streamlit==1.25.0                              
+python-dotenv==1.0.0
+st-copy-to-clipboard==0.1.0
+google-api-python-client==2.99.0                             
+openai==0.28.0                              
+requests==2.31.0                             
+Pillow==10.0.0                              
+youtube-dl==2021.12.17                              
+beautifulsoup4==4.13.0                                                        
