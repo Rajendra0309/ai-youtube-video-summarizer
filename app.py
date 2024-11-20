@@ -155,60 +155,131 @@ class AIVideoSummarizer:
         # Dark purple gradient background close to black
         page_bg_img = """
         <style>
-        /* Container for content */
-        [data-testid="stAppViewContainer"] {
-            background: url('https://source.unsplash.com/1600x900/?nature,water') center/cover no-repeat; /* Example background image */
-            background-size: cover;
-            background-blur: 10px;
-        }
+            /* Royal Color Palette */
+            :root {
+                --deep-purple: #4A0E4E;       /* Deep royal purple */
+                --royal-gold: #D4AF37;        /* Elegant gold */
+                --rich-navy: #0A2342;         /* Deep navy blue */
+                --regal-crimson: #850E35;     /* Regal crimson */
+                --midnight-blue: #1B264F;     /* Dark midnight blue */
+            }
 
-        /* Apply a very dark purple gradient background close to black */
-        .stApp {
-            background: linear-gradient(to bottom right, #2B0B3C, #15061A); /* Very dark purple to near black */
-            opacity: 0.95;
-        }
+            /* Global Background */
+            [data-testid="stAppViewContainer"] {
+                background: linear-gradient(135deg, var(--deep-purple), var(--rich-navy));
+                background-attachment: fixed;
+                min-height: 100vh;
+            }
 
-        /* Ensure content remains visible */
-        .main-content {
-            background-color: rgba(255, 255, 255, 0.85); /* Slight white background for readability */
-            padding: 20px;
-            border-radius: 15px;
-        }
+            /* Main App Container */
+            .stApp {
+                background: transparent;
+            }
 
-        /* Title Styling */
-        .title {
-            text-align: center;
-            font-size: 42px;
-            font-weight: bold;
-            background: linear-gradient(90deg, #0283C3, #4CAF50); /* Bright gradient for the title */
-            -webkit-background-clip: text;
-            color: transparent;
-            margin-bottom: 20px;
-            animation: gradient 3s ease-in-out infinite;
-        }
+            /* Elegant Glassmorphic Design */
+            [data-testid="stVerticalBlock"] {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                padding: 20px;
+                margin-bottom: 20px;
+            }
 
-        @keyframes gradient {
-            0% { background-position: 0%; }
-            50% { background-position: 100%; }
-            100% { background-position: 0%; }
-        }
+            /* Royal Title Styling */
+            .title {
+                text-align: center;
+                font-size: 48px;
+                font-weight: bold;
+                background: linear-gradient(45deg, var(--royal-gold), var(--regal-crimson));
+                -webkit-background-clip: text;
+                color: transparent;
+                margin-bottom: 30px;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                animation: royal-gradient 5s ease infinite;
+            }
 
-        /* Button Styling */
-        .stButton>button {
-            background-color: #0283C3;
-            color: white;
-            border-radius: 25px;
-            font-size: 16px;
-            padding: 12px 30px;
-            margin-top: 10px;
-            transition: transform 0.2s ease-in-out;
-        }
+            @keyframes royal-gradient {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
 
-        .stButton>button:hover {
-            transform: scale(1.05);
-            background-color: #4CAF50;
-        }
+            /* Button Styling */
+            .stButton>button {
+                background: linear-gradient(to right, var(--royal-gold), var(--regal-crimson)) !important;
+                color: white !important;
+                border: none;
+                border-radius: 30px;
+                font-size: 16px;
+                font-weight: bold;
+                padding: 12px 30px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
 
+            .stButton>button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+                background: linear-gradient(to right, var(--regal-crimson), var(--royal-gold)) !important;
+            }
+
+            /* Radio Button Styling */
+            .stRadio>div {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 15px;
+                padding: 15px;
+            }
+
+            .stRadio [data-testid="stMarkdownContainer"] {
+                color: var(--royal-gold);
+                font-weight: bold;
+            }
+
+            /* Input Styling */
+            .stTextInput>div>div>input {
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid var(--royal-gold);
+                color: white;
+                border-radius: 10px;
+                padding: 10px;
+                transition: all 0.3s ease;
+            }
+
+            .stTextInput>div>div>input:focus {
+                border-color: var(--royal-gold);
+                box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            }
+
+            /* Spinner Styling */
+            .stSpinner>div {
+                border-top-color: var(--royal-gold) !important;
+                border-right-color: var(--royal-gold) !important;
+            }
+
+            /* Footer Styling */
+            .footer {
+                color: var(--royal-gold);
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            }
+
+            /* Scrollbar Styling */
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: var(--deep-purple);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--royal-gold);
+                border-radius: 5px;
+            }
         </style>
         """
         st.markdown(page_bg_img, unsafe_allow_html=True)
