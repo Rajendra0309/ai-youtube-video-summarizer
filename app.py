@@ -108,8 +108,17 @@ class AIVideoSummarizer:
 
     def run(self):
         st.set_page_config(page_title="AI Video Summarizer", layout="wide")
-        st.title("🎬 AI Video Summarizer")
+        col1, col2 = st.columns([1, 14])  # The first column takes less space than the second
+
+        with col1:
+            st.image("https://em-content.zobj.net/content/2020/04/05/yt.png", width=60)  # Adjust width as needed
+
+        with col2:
+        # Custom HTML to increase the title font size
+            st.markdown('<h1 style="font-size: 35px;">AI Video Summarizer</h1>', unsafe_allow_html=True)
         self.get_youtube_info()
+
+
 
         if self.youtube_url:
             mode = st.selectbox("What would you like to generate?", ["Summary", "Timestamps", "Transcript"])
