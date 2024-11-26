@@ -108,7 +108,7 @@ class AIVideoSummarizer:
 
     def run(self):
         st.set_page_config(page_title="AI Video Summarizer", layout="wide")
-        col1, col2 = st.columns([1, 14])  # The first column takes less space than the second
+        col1, col2 = st.columns([1, 11])  # The first column takes less space than the second
 
         with col1:
             st.image("https://em-content.zobj.net/content/2020/04/05/yt.png", width=60)  # Adjust width as needed
