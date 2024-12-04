@@ -1,66 +1,127 @@
 class Prompt:
     @staticmethod
     def prompt1(ID=0):
-        if ID == 0:
-            prompt_text = """Your task: Create a captivating, detailed, and engaging summary of a video transcript that offers comprehensive insights into the content, while remaining concise and informative.
+        """
+        Generate context-specific prompts for different video content processing tasks.
+        
+        Args:
+            ID (str or int): Identifier for the specific prompt type
+            
+        Returns:
+            str: Detailed prompt text for the specified task
+        """
+        if ID == 0:  # Summary Prompt
+            prompt_text = """Comprehensive Video Summary Generation Task
 
-Guidelines:
-    1. **Focus on Key Details**: Highlight the core messages, supporting arguments, and notable moments from the video in a structured format.
-    2. **Organize into Sections**: Break down the summary into:
-        - Introduction: Briefly introduce the video's context and main subject.
-        - Key Points:
-            - Subsection 1: Discuss the first major aspect with relevant details.
-            - Subsection 2: Include the next significant point with clarity.
-            - Continue organizing additional key points into subsections.
-        - Conclusion: Wrap up with the video's primary takeaways, leaving a strong impression on the audience.
-    3. **Word Count**: Aim for up to 300 words to provide depth without losing conciseness.
-    4. **Tailor the Tone**: Adapt the tone to align with the intended audience (professional, casual, etc.).
+Objective: Create an engaging, insightful, and concise summary that captures the essence of the video while providing maximum value to the reader.
 
-Additional Recommendations:
-    - Use storytelling elements to make the summary engaging.
-    - Ensure the summary is free of grammatical issues or typos.
-    - Include compelling language and vivid descriptions to maintain interest.
+Detailed Guidelines:
+    1. **Content Structure**
+    - Craft a compelling introduction that sets the context
+    - Systematically break down key points into clear subsections
+    - Conclude with impactful takeaways and broader implications
 
-By following these guidelines, you can craft summaries that engage readers, encapsulate the video's essence, and invite further exploration."""
+    2. **Content Depth**
+    - Extract core messages and critical insights
+    - Balance technical details with accessible language
+    - Highlight unique perspectives or novel information
+
+    3. **Formatting Recommendations**
+    - Use markdown for enhanced readability
+    - Bold key terms and concepts
+    - Create a logical flow between sections
+    - Maintain a professional yet engaging tone
+
+    4. **Analytical Approach**
+    - Identify and explain the video's primary thesis
+    - Provide context for complex ideas
+    - Connect individual points to the overarching narrative
+
+    5. **Audience Considerations**
+    - Adapt complexity to target audience
+    - Use clear, precise language
+    - Avoid jargon unless explicitly explained
+
+Specific Requirements:
+    - Total Length: 250-350 words
+    - Clarity: Crystal clear explanations
+    - Objectivity: Balanced and neutral perspective
+    - Engagement: Make the summary compelling and informative
+
+Evaluation Criteria:
+    - Accuracy of content representation
+    - Clarity of explanation
+    - Comprehensive coverage
+    - Readability and flow"""
 
         elif ID == "timestamp":
-            prompt_text = """Your task: Generate detailed and precise timestamps for the key topics discussed in a video, making navigation and content consumption effortless.
+            prompt_text = """Timestamp Generation Task
 
-Instructions:
-    1. Identify major chapters or topics from the video transcript and create clear, concise titles.
-    2. Format timestamps as **hh:mm:ss** and provide clickable URLs using the video link.
-    3. Present the output in Markdown format:
-        - [hh:mm:ss](%VIDEO_URL?t=seconds) Topic Title
-        - Example:
-            1. [00:03:12](https://youtu.be/hCaXor?t=192) Introduction
-            2. [00:12:45](https://youtu.be/hCaXor?t=765) Key Topic 1
-            3. [00:25:30](https://youtu.be/hCaXor?t=1530) Key Topic 2
+            Guidelines:
+                1. Generate precise timestamps for key video segments
+                2. Format: [HH:MM:SS] Concise Topic Description
+                3. Limit each description to one clear, short line
+                4. Focus on capturing the main point of each segment
+                5. Ensure timestamps reflect significant content transitions
 
-Enhancements:
-    - Include subheadings for segments within the main chapters if necessary.
-    - Ensure topics are concise but descriptive enough to summarize the segment effectively.
-    - Highlight transitions or pivotal moments to help the audience navigate the content better.
+            Output Format Example:
+                1. [00:02:15] Video Introduction
+                2. [00:12:45] Main Argument Presentation
+                3. [00:25:30] Key Findings and Insights
+                4. [00:40:22] Conclusion and Takeaways
 
-**Markdown Output**:
-1. hh:mm:ss %Topic Title%
-2. hh:mm:ss %Topic Title%
-3. hh:mm:ss %Topic Title% ..."""
+            Execution Principles:
+                - Be precise
+                - Use clear, succinct language
+                - Capture the essence of each segment"""
 
         elif ID == "transcript":
-            prompt_text = """Your task: Generate an expanded transcription with enhanced formatting and structure that is optimized for clarity and readability.
+            prompt_text = """Advanced Transcript Transformation Guidelines
 
-    Guidelines:
-        1. **Maintain Accuracy**: Ensure the transcription accurately reflects the video's audio, including speaker identifiers, pauses, and contextually relevant sounds.
-        2. **Segment by Topic**: Divide the transcription into clearly defined sections or paragraphs based on content flow.
-        3. **Include Timestamps**: Add timestamps every 30 seconds or at the start of significant topics for easy navigation.
-        4. **Use Visual Cues**:
-        - Use **bold** for key terms, phrases, or names.
-        - Italicize emphasis where needed.
-        - Format speaker labels consistently (e.g., **[Speaker Name]**: Dialogue).
-        5. **Add Context**: Include non-verbal cues or descriptions of significant visual actions (e.g., *[Audience applauds]*, *[Presenter writes on the board]*).
+Comprehensive Transcript Generation Objectives:
+    1. **Structural Integrity**
+    - Transform spoken word into readable text
+    - Maintain original meaning and tone
+    - Create a narrative-like reading experience
 
-    By ensuring the transcript is clear, well-organized, and visually accessible, you can provide a detailed, reader-friendly representation of the video's content."""
+    2. **Formatting Excellence**
+    Detailed Formatting Specifications:
+    - Use markdown for enhanced readability
+    - **Bold** key concepts and critical terms
+    - *Italicize* for emotional emphasis
+    - Insert [Contextual Annotations] for non-verbal cues
+
+    3. **Speaker Dynamics**
+    - **[Speaker Name]**: Clearly identify speakers
+    - Preserve speaking style and nuance
+    - Handle multi-speaker scenarios with clarity
+
+    4. **Timestamp Integration**
+    - Insert timestamps at section transitions
+    - Format: **[00:05:30]** Section Heading
+    - Provide seamless navigation references
+
+    5. **Linguistic Refinement**
+    - Remove filler words strategically
+    - Correct minor grammatical inconsistencies
+    - Maintain natural conversational flow
+
+    6. **Contextual Enrichment**
+    - Add explanatory notes for technical terms
+    - Provide background information when necessary
+    - Create a comprehensive reading experience
+
+    7. **Accessibility Considerations**
+    - Ensure clear, readable formatting
+    - Break complex discussions into digestible paragraphs
+    - Support multiple comprehension levels
+
+Special Directives:
+    - Prioritize comprehensive understanding
+    - Balance technical accuracy with readability
+    - Transform spoken content into an engaging document"""
+
         else:
-            prompt_text = "NA"
+            prompt_text = "Invalid prompt request"
 
         return prompt_text
