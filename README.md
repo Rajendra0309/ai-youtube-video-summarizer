@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="https://i.imgur.com/Jk1wxO3.png" alt="AI YouTube Video Summarizer" width="200">
+  <img src="https://www.freepnglogos.com/uploads/youtube-circle-icon-png-logo-14.png" alt="AI YouTube Video Summarizer" width="200">
   <br>
    🎥 AI Video Summarization & Timestamp Generator
   <br>
@@ -40,9 +40,9 @@ This project is an AI-powered video summarizer designed specifically for YouTube
 ### Usage
 
 1. Clone the repository:
-git clone 
+git clone https://github.com/Rajendra0309/ai-youtube-video-summarizer.git
 2. Navigate to the project directory:
-cd 
+cd ai-youtube-video-summarizer
 3. Install dependencies:
 pip install -r requirements.txt
 4. Create a ".env" file ⬇️ [add whichever is available]
