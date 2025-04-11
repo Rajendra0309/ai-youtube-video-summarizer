@@ -10,7 +10,6 @@ def modify_index_html(self):
   <script src="./streamlit-component-lib.js"></script>
   <script src="./main.js"></script>
   <style>
-    /* Base styles */
     :root {
       --bg-color-light: #ffffff;
       --text-color-light: #000000;
@@ -29,7 +28,6 @@ def modify_index_html(self):
       transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Light mode (default) */
     body {
       background-color: var(--bg-color-light);
       color: var(--text-color-light);
@@ -40,7 +38,6 @@ def modify_index_html(self):
       color: var(--text-color-dark);
     }
 
-    /* Button styles */
     .st-copy-to-clipboard-btn {
       background-color: var(--button-bg-light);
       color: var(--text-color-light);
@@ -78,11 +75,9 @@ def modify_index_html(self):
   </div>
 
   <script>
-    // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
 
-    // Check for saved theme preference or default to light mode
     if (localStorage.getItem('theme') === 'dark') {
       body.classList.add('dark-mode');
     }
@@ -90,11 +85,9 @@ def modify_index_html(self):
     themeToggle.addEventListener('click', () => {
       body.classList.toggle('dark-mode');
       
-      // Save theme preference
       const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
       localStorage.setItem('theme', currentTheme);
       
-      // Send theme change to Streamlit
       window.parent.postMessage({
         type: 'streamlit:theme',
         theme: currentTheme

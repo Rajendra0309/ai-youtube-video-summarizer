@@ -12,12 +12,11 @@
   <a href="#overview-">Overview</a> •
   <a href="#features-">Features</a> •
   <a href="#getting-started-">Getting Started</a> •
-  <a href="#contributing">Contributing</a> 
+  <a href="#contributing">Contributing</a> •
+  <a href="https://ai-youtube-video-summarizer.streamlit.app/" target="_blank">Live Demo</a>
 </p>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com//main/research/demo3.gif" alt="Usage Demo">
-</p>
+
 
 ## Overview 📝
 

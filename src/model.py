@@ -20,7 +20,6 @@ class Model:
         Returns:
             str: Generated content or error message
         """
-        # Check if transcript exists
         if not transcript:
             return "⚠️ No transcript available for this video. The video may not have captions."
             
@@ -31,11 +30,9 @@ class Model:
             if not api_key:
                 return "⚠️ Missing Gemini API key. Please add your API key to the .env file."
             
-            # Use direct API approach with REST API
             url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key={api_key}"
             headers = {"Content-Type": "application/json"}
-            
-            # Make sure we don't exceed context limits by truncating if needed
+            d
             if len(transcript) > 30000:
                 transcript = transcript[:30000] + "... (transcript truncated)"
                 
@@ -58,7 +55,6 @@ class Model:
                         return "\n".join(texts)
                 return "⚠️ Unexpected response format from Gemini API."
             else:
-                # If 404 with gemini-1.5-pro, try gemini-pro
                 if response.status_code == 404:
                     url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={api_key}"
                     response = requests.post(url, headers=headers, data=json.dumps(data))
