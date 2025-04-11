@@ -47,49 +47,21 @@ try:
 except ImportError:
     has_clipboard = False
 
-def is_cloud_environment():
-    """Check if running in Streamlit Cloud or Render"""
-    cloud_env_vars = [
-        'STREAMLIT_SHARING', 'RENDER', 'VERCEL', 'HEROKU_APP_ID', 
-        'DYNO', 'AWS_LAMBDA_FUNCTION_NAME', 'NETLIFY'
-    ]
-    
-    for env_var in cloud_env_vars:
-        if os.environ.get(env_var):
-            return True
-            
-    try:
-        if hasattr(st, 'context') and hasattr(st.context, 'headers'):
-            headers = st.context.headers
-            if headers and ('x-forwarded-host' in headers or 'fly-region' in headers):
-                return True
-    except:
-        pass
-    
-    return False
-
-IN_CLOUD_ENV = is_cloud_environment()
-
-try:
-    from src.transcript_fallback import TranscriptFallback
-    has_fallback_service = True
-except ImportError:
-    has_fallback_service = False
-
 from dotenv import load_dotenv
 from src.video_info import GetVideo
 from src.model import Model
 from src.prompt import Prompt
 from src.timestamp_formatter import TimestampFormatter
 
-try:
-    from src.demo_videos import get_demo_videos
-    has_demo_videos = True
-except ImportError:
-    has_demo_videos = False
-
 if not check_dependencies():
     st.stop()
+
+EXAMPLE_VIDEOS = [
+    {"title": "Python Tutorial for Beginners", "url": "https://youtu.be/_uQrJ0TkZlc"},
+    {"title": "How the Internet Works", "url": "https://youtu.be/x3c1ih2NJEg"},
+    {"title": "Learn Git in 15 Minutes", "url": "https://youtu.be/USjZcfj8yxE"},
+    {"title": "Introduction to Machine Learning", "url": "https://youtu.be/ukzFI9rgwfU"}
+]
 
 class AIVideoSummarizer:
     def __init__(self):
@@ -105,19 +77,7 @@ class AIVideoSummarizer:
         self.time_stamps = ""
         self.transcript = ""
         self.model_name = "Gemini"
-        self.in_cloud = IN_CLOUD_ENV
         load_dotenv()
-        
-        if self.in_cloud:
-            st.sidebar.info("""
-            📌 **Running in cloud environment**
-            
-            YouTube transcript access may be limited. If you encounter issues:
-            - Try videos with manually added captions
-            - Try different videos
-            - Some educational channels typically have good transcripts
-            """)
-            st.sidebar.markdown("---")
 
     def _set_theme(self):
         if st.session_state.theme == 'dark':
@@ -226,18 +186,15 @@ class AIVideoSummarizer:
         )
         st.markdown("</div>", unsafe_allow_html=True)
         
-        if self.in_cloud and not self.youtube_url and has_demo_videos:
-            st.markdown("### 🎬 Try these videos with working captions:")
-            demos = get_demo_videos()
-            
+        if not self.youtube_url:
+            st.markdown("### 🎬 Try these example videos:")
             cols = st.columns(2)
-            for i, demo in enumerate(demos[:6]):  
+            for i, demo in enumerate(EXAMPLE_VIDEOS):  
                 col = cols[i % 2]
                 with col:
                     if st.button(f"📺 {demo['title']}", key=f"demo_{i}"):
                         st.session_state.youtube_input = demo['url']
                         st.experimental_rerun()
-                    st.caption(f"Channel: {demo['channel']}")
 
         if not os.getenv("GOOGLE_GEMINI_API_KEY"):
             st.warning(
@@ -288,59 +245,50 @@ class AIVideoSummarizer:
                 st.error(f"⚠️ Error loading video: {str(e)}")
                 print(f"Error details: {traceback.format_exc()}")
 
-    def get_transcript_with_fallbacks(self):
-        """Get transcript with multiple fallback options"""
+    def get_transcript(self):
         if not self.youtube_url or not self.video_id:
             return None
             
-        transcript = GetVideo.transcript(self.youtube_url)
-        if transcript:
-            return transcript
-            
-        if has_fallback_service and self.in_cloud:
-            st.info("🔄 Primary transcript retrieval failed. Trying alternative methods...")
-            transcript = TranscriptFallback.get_transcript(self.video_id)
-            if transcript:
-                return transcript
+        for attempt in range(2):
+            try:
+                transcript = GetVideo.transcript(self.youtube_url)
+                if transcript:
+                    return transcript
+            except:
+                pass
         
         return None
         
-    def get_transcript_with_timestamps_fallbacks(self):
-        """Get timestamped transcript with fallbacks"""
+    def get_transcript_time(self):
         if not self.youtube_url or not self.video_id:
             return None
             
-        transcript = GetVideo.transcript_time(self.youtube_url)
-        if transcript:
-            return transcript
-      
-        if has_fallback_service and self.in_cloud:
-            st.info("🔄 Primary transcript retrieval failed. Trying alternative methods...")
-            transcript = TranscriptFallback.get_transcript_with_timestamps(self.video_id)
-            if transcript:
-                return transcript
+        for attempt in range(2):
+            try:
+                transcript = GetVideo.transcript_time(self.youtube_url)
+                if transcript:
+                    return transcript
+            except:
+                pass
         
         return None
 
     def generate_summary(self):
         with st.spinner("🤖 AI is crafting a concise summary..."):
             try:
-                self.video_transcript = self.get_transcript_with_fallbacks()
+                self.video_transcript = self.get_transcript()
                 if not self.video_transcript:
                     st.error("😔 Transcript could not be retrieved.")
                     st.markdown("""
-                    ### Troubleshooting Tips:
-                    
                     This could be because:
-                    1. The video doesn't have captions/subtitles available
-                    2. The captions might be auto-generated and not accessible via API
-                    3. YouTube's API access might be restricted from this deployment environment
+                    - The video doesn't have captions/subtitles available
+                    - The captions might be auto-generated and not accessible via API
+                    - YouTube's API access might be restricted from this deployment environment
                     
-                    **Things to try:**
-                    - Try videos from educational channels (they often have manually added captions)
-                    - Try a different video with manually added captions
-                    - Try running the app locally instead of in cloud environment
-                    - Check some of the example videos listed in the documentation
+                    Try:
+                    - A different video with manually added captions
+                    - Educational channels usually have good transcripts
+                    - One of the example videos provided above
                     """)
                     return
 
@@ -367,22 +315,19 @@ class AIVideoSummarizer:
     def generate_time_stamps(self):
         with st.spinner("🕒 Generating Timestamps..."):
             try:
-                self.video_transcript_time = self.get_transcript_with_timestamps_fallbacks()
+                self.video_transcript_time = self.get_transcript_time()
                 if not self.video_transcript_time:
                     st.error("😔 Transcript with timestamps could not be retrieved.")
                     st.markdown("""
-                    ### Troubleshooting Tips:
-                    
                     This could be because:
-                    1. The video doesn't have captions/subtitles available
-                    2. The captions might be auto-generated and not accessible via API
-                    3. YouTube's API access might be restricted from this deployment environment
+                    - The video doesn't have captions/subtitles available
+                    - The captions might be auto-generated and not accessible via API
+                    - YouTube's API access might be restricted from this deployment environment
                     
-                    **Things to try:**
-                    - Try videos from educational channels (they often have manually added captions)
-                    - Try a different video with manually added captions
-                    - Try running the app locally instead of in cloud environment
-                    - Check some of the example videos listed in the documentation
+                    Try:
+                    - A different video with manually added captions
+                    - Educational channels usually have good transcripts
+                    - One of the example videos provided above
                     """)
                     return
                     
@@ -414,22 +359,19 @@ class AIVideoSummarizer:
     def generate_transcript(self):
         with st.spinner("📝 Fetching Transcript..."):
             try:
-                self.video_transcript = self.get_transcript_with_fallbacks()
+                self.video_transcript = self.get_transcript()
                 if not self.video_transcript:
                     st.error("😔 Transcript could not be retrieved.")
                     st.markdown("""
-                    ### Troubleshooting Tips:
-                    
                     This could be because:
-                    1. The video doesn't have captions/subtitles available
-                    2. The captions might be auto-generated and not accessible via API
-                    3. YouTube's API access might be restricted from this deployment environment
+                    - The video doesn't have captions/subtitles available
+                    - The captions might be auto-generated and not accessible via API
+                    - YouTube's API access might be restricted from this deployment environment
                     
-                    **Things to try:**
-                    - Try videos from educational channels (they often have manually added captions)
-                    - Try a different video with manually added captions
-                    - Try running the app locally instead of in cloud environment
-                    - Check some of the example videos listed in the documentation
+                    Try:
+                    - A different video with manually added captions
+                    - Educational channels usually have good transcripts
+                    - One of the example videos provided above
                     """)
                     return
 
@@ -457,7 +399,6 @@ class AIVideoSummarizer:
 
     def run(self):
         self._set_theme()
-
         self._theme_toggle()
 
         col1, col2 = st.columns([1, 11])
