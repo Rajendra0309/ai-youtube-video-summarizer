@@ -7,15 +7,25 @@ class GetVideo:
     @staticmethod
     def Id(link):
         """Extracts the video ID from a YouTube video link."""
-        if "youtube.com" in link:
-            pattern = r'youtube\.com/watch\?v=([a-zA-Z0-9_-]+)'
-            video_id = re.search(pattern, link).group(1)
-            return video_id
-        elif "youtu.be" in link:
-            pattern = r"youtu\.be/([a-zA-Z0-9_-]+)"
-            video_id = re.search(pattern, link).group(1)
-            return video_id
-        else:
+        try:
+            if "youtube.com" in link:
+                pattern = r'(?:youtube\.com/watch\?v=|youtube\.com/embed/|youtube\.com/v/|youtube\.com/\?v=)([a-zA-Z0-9_-]+)'
+                match = re.search(pattern, link)
+                if match:
+                    return match.group(1)
+            elif "youtu.be" in link:
+                pattern = r'youtu\.be/([a-zA-Z0-9_-]+)'
+                match = re.search(pattern, link)
+                if match:
+                    return match.group(1)
+            
+            # If all else fails, try a generic approach
+            video_id = link.split("v=")[-1].split("&")[0]
+            if len(video_id) == 11:
+                return video_id
+                
+            return None
+        except Exception:
             return None
 
     @staticmethod
@@ -35,17 +45,22 @@ class GetVideo:
         """Gets the transcript of a YouTube video."""
         video_id = GetVideo.Id(link)
         try:
+            if video_id is None:
+                return None
             transcript_dict = YouTubeTranscriptApi.get_transcript(video_id)
             final_transcript = " ".join(i["text"] for i in transcript_dict)
             return final_transcript
         except Exception as e:
-            print(e)
+            print(f"Error getting transcript: {e}")
+            return None
 
     @staticmethod
     def transcript_time(link):
         """Gets the transcript of a YouTube video with timestamps."""
         video_id = GetVideo.Id(link)
         try:
+            if video_id is None:
+                return None
             transcript_dict = YouTubeTranscriptApi.get_transcript(video_id)
             final_transcript = ""
             for i in transcript_dict:
@@ -58,5 +73,5 @@ class GetVideo:
                 final_transcript += f'{i["text"]} "time:{timevex}" '
             return final_transcript
         except Exception as e:
-            print(e)
-            return video_id
+            print(f"Error getting transcript with timestamps: {e}")
+            return None

@@ -1,11 +1,7 @@
 import streamlit as st
 import os
-from src.video_info import GetVideo
-from src.model import Model
-from src.prompt import Prompt
-from src.timestamp_formatter import TimestampFormatter
-from st_copy_to_clipboard import st_copy_to_clipboard
-from dotenv import load_dotenv
+import sys
+import importlib.util
 
 # Set page config at the very beginning
 st.set_page_config(
@@ -14,6 +10,57 @@ st.set_page_config(
     layout="wide", 
     initial_sidebar_state="collapsed"
 )
+
+# Check for required packages and handle the Google Generative AI dependency issue
+def check_dependencies():
+    missing_packages = []
+    packages_to_check = [
+        ("youtube_transcript_api", "youtube-transcript-api"),
+        ("dotenv", "python-dotenv"),
+        ("bs4", "beautifulsoup4"),
+        ("requests", "requests")
+    ]
+    
+    for module_name, package_name in packages_to_check:
+        spec = importlib.util.find_spec(module_name.split('.')[0])
+        if spec is None:
+            missing_packages.append(package_name)
+    
+    # Special check for google.generativeai - silently handle it
+    try:
+        import google.generativeai
+        # No success message here to avoid showing in UI
+    except ImportError as e:
+        if "google-generativeai" not in missing_packages:
+            missing_packages.append("google-generativeai")
+    except Exception as e:
+        # Don't show any warning, just continue with fallback approach
+        pass
+    
+    if missing_packages:
+        st.error(f"⚠️ Missing required packages: {', '.join(missing_packages)}")
+        st.code(f"pip install {' '.join(missing_packages)}")
+        st.info("Please install the missing packages and restart the application.")
+        return False
+    return True
+
+# Try to load the copy to clipboard package
+try:
+    from st_copy_to_clipboard import st_copy_to_clipboard
+    has_clipboard = True
+except ImportError:
+    has_clipboard = False
+
+# Now import the rest of our modules
+from dotenv import load_dotenv
+from src.video_info import GetVideo
+from src.model import Model
+from src.prompt import Prompt
+from src.timestamp_formatter import TimestampFormatter
+
+# Run dependency check silently
+if not check_dependencies():
+    st.stop()
 
 class AIVideoSummarizer:
     def __init__(self):
@@ -146,80 +193,113 @@ class AIVideoSummarizer:
         if not os.getenv("GOOGLE_GEMINI_API_KEY"):
             st.warning(
                 "⚠️ **Gemini API key is missing!** \n\n"
-                "Please set the API key in your environment variables to use this application. "
-                "You can obtain an API key from the Google AI Studio."
+                "Please set the API key in your environment variables or .env file to use this application. "
+                "You can obtain an API key from the [Google AI Studio](https://makersuite.google.com/app/apikey)."
             )
-            st.stop()
+            if not self.youtube_url:
+                st.stop()
 
         # Video Embedding with Enhanced Style
         if self.youtube_url:
             self.video_id = GetVideo.Id(self.youtube_url)
             if self.video_id is None:
-                st.error("Invalid YouTube URL. Please check and try again.")
+                st.error("⚠️ Invalid YouTube URL. Please provide a valid YouTube video link.")
                 st.stop()
             
-            self.video_title = GetVideo.title(self.youtube_url)
-            st.markdown(f'<h3 style="text-align: center; color: #007bff;">{self.video_title}</h3>', unsafe_allow_html=True)
-            
-            # Centered Video Embed with Shadow and Round Corners
-            st.markdown(
-                f'<div style="display: flex; justify-content: center; margin-bottom: 20px;">'
-                f'<div style="'
-                f'box-shadow: 0 10px 25px rgba(0,0,0,0.1); '
-                f'border-radius: 15px; '
-                f'background-color: white; '
-                f'padding: 10px; '
-                f'display: inline-block;">'
-                f'<iframe width="560" height="315" '
-                f'src="https://www.youtube.com/embed/{self.video_id}" '
-                f'frameborder="0" '
-                f'style="border-radius: 10px;" '
-                f'allowfullscreen></iframe>'
-                f'</div></div>', 
-                unsafe_allow_html=True
-            )
+            try:
+                self.video_title = GetVideo.title(self.youtube_url)
+                if self.video_title and self.video_title.startswith("⚠️"):
+                    st.error(self.video_title)
+                else:
+                    st.markdown(f'<h3 style="text-align: center; color: #007bff;">{self.video_title}</h3>', unsafe_allow_html=True)
+                
+                # Centered Video Embed with Shadow and Round Corners
+                st.markdown(
+                    f'<div style="display: flex; justify-content: center; margin-bottom: 20px;">'
+                    f'<div style="'
+                    f'box-shadow: 0 10px 25px rgba(0,0,0,0.1); '
+                    f'border-radius: 15px; '
+                    f'background-color: white; '
+                    f'padding: 10px; '
+                    f'display: inline-block;">'
+                    f'<iframe width="560" height="315" '
+                    f'src="https://www.youtube.com/embed/{self.video_id}" '
+                    f'frameborder="0" '
+                    f'style="border-radius: 10px;" '
+                    f'allowfullscreen></iframe>'
+                    f'</div></div>', 
+                    unsafe_allow_html=True
+                )
+            except Exception as e:
+                st.error(f"⚠️ Error loading video: {str(e)}")
 
     def generate_summary(self):
         with st.spinner("🤖 AI is crafting a concise summary..."):
             try:
                 self.video_transcript = GetVideo.transcript(self.youtube_url)
                 if not self.video_transcript:
-                    st.error("😔 Transcript could not be retrieved. Please check the video URL.")
+                    st.error("😔 Transcript could not be retrieved. This video may not have captions available.")
                     return
 
                 self.summary = Model.google_gemini(self.video_transcript, Prompt.prompt1())
                 
-                if not self.summary or not isinstance(self.summary, str):
-                    st.error("🚨 Failed to generate summary. Please try again later.")
+                if isinstance(self.summary, str) and self.summary.startswith("⚠️"):
+                    st.error(self.summary)
                     return
-
+                    
                 st.markdown("### 📝 Video Summary")
                 st.markdown(f'<div style="background-color: rgba(0,123,255,0.1); padding: 20px; border-radius: 10px;">{self.summary}</div>', unsafe_allow_html=True)
-                st_copy_to_clipboard(self.summary)
+                
+                if has_clipboard:
+                    st_copy_to_clipboard(self.summary)
+                else:
+                    if st.button("📋 Copy Summary"):
+                        # Provide alternative copy method for browsers
+                        st.code(self.summary)
+                        st.info("Select the text above and use Ctrl+C (or Cmd+C) to copy")
     
             except Exception as e:
-                st.error(f"An unexpected error occurred: {str(e)}")
+                st.error(f"⚠️ An unexpected error occurred: {str(e)}")
 
     def generate_time_stamps(self):
         with st.spinner("🕒 Generating Timestamps..."):
-            self.video_transcript_time = GetVideo.transcript_time(self.youtube_url)
-            raw_timestamps = Model.google_gemini(self.video_transcript_time, Prompt.prompt1(ID='timestamp'))
-        
-        # Format timestamps
-            formatted_timestamps = TimestampFormatter.format(raw_timestamps)
-        
-            st.markdown("### 🕰️ Video Timestamps")
-            st.markdown(
-                f'<div style="background-color: rgba(40,167,69,0.1); padding: 20px; border-radius: 10px; white-space: pre-wrap;">{formatted_timestamps}</div>', 
-                unsafe_allow_html=True
-            )
+            try:
+                self.video_transcript_time = GetVideo.transcript_time(self.youtube_url)
+                if not self.video_transcript_time:
+                    st.error("😔 Transcript with timestamps could not be retrieved. This video may not have captions available.")
+                    return
+                    
+                raw_timestamps = Model.google_gemini(self.video_transcript_time, Prompt.prompt1(ID='timestamp'))
+                
+                if isinstance(raw_timestamps, str) and raw_timestamps.startswith("⚠️"):
+                    st.error(raw_timestamps)
+                    return
+                
+                # Format timestamps
+                formatted_timestamps = TimestampFormatter.format(raw_timestamps)
+                
+                st.markdown("### 🕰️ Video Timestamps")
+                st.markdown(
+                    f'<div style="background-color: rgba(40,167,69,0.1); padding: 20px; border-radius: 10px; white-space: pre-wrap;">{formatted_timestamps}</div>', 
+                    unsafe_allow_html=True
+                )
+                
+                if has_clipboard:
+                    st_copy_to_clipboard(formatted_timestamps)
+                else:
+                    if st.button("📋 Copy Timestamps"):
+                        st.code(formatted_timestamps)
+                        st.info("Select the text above and use Ctrl+C (or Cmd+C) to copy")
+            
+            except Exception as e:
+                st.error(f"⚠️ An unexpected error occurred: {str(e)}")
 
     def generate_transcript(self):
         with st.spinner("📝 Fetching Transcript..."):
             try:
                 self.video_transcript = GetVideo.transcript(self.youtube_url)
                 if not self.video_transcript:
-                    st.error("😔 Transcript could not be retrieved. Please check the video URL.")
+                    st.error("😔 Transcript could not be retrieved. This video may not have captions available.")
                     return
 
                 self.transcript = self.video_transcript
@@ -231,9 +311,14 @@ class AIVideoSummarizer:
                     self.transcript,
                     height=500,  # Set a fixed height
                     placeholder="Transcript will appear here...",
+                    key="transcript_area"
                 )
+                
+                if has_clipboard:
+                    st_copy_to_clipboard(self.transcript)
+                    
             except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
+                st.error(f"⚠️ An error occurred: {str(e)}")
 
     def run(self):
         # Apply theme at the start of the run

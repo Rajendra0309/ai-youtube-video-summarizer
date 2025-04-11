@@ -1,5 +1,21 @@
 import re
-import strip_markdown
+import sys
+import os
+
+# Check if strip_markdown module exists, otherwise use internal implementation
+try:
+    from . import strip_markdown
+except ImportError:
+    # Define internal strip_markdown function
+    def strip_markdown(text):
+        if not text:
+            return ""
+        # Remove markdown formatting
+        text = re.sub(r'\*\*(.+?)\*\*', r'\1', text)  # Bold
+        text = re.sub(r'\*(.+?)\*', r'\1', text)  # Italic
+        text = re.sub(r'\[(.+?)\]\(.+?\)', r'\1', text)  # Links
+        text = re.sub(r'^#+\s+(.+)$', r'\1', text, flags=re.MULTILINE)  # Headers
+        return text
 
 class TimestampFormatter:
     @staticmethod
@@ -42,8 +58,18 @@ class TimestampFormatter:
         Returns:
             str: Formatted timestamps
         """
-        # Remove markdown formatting
-        clean_text = strip_markdown.strip_markdown(gentext)
+        if not gentext:
+            return "No timestamps available"
+            
+        # Clean text using either imported or internal strip_markdown
+        try:
+            if 'strip_markdown' in sys.modules:
+                clean_text = sys.modules['strip_markdown'].strip_markdown(gentext)
+            else:
+                clean_text = strip_markdown(gentext)
+        except Exception:
+            # If stripping fails, use the original text
+            clean_text = gentext
         
         # Split the input into lines
         lines = clean_text.split('\n')
@@ -55,11 +81,15 @@ class TimestampFormatter:
             if not line:
                 continue
             
-            # Try to split line into timestamp and description
-            match = re.match(r'^(\d{1,2}:\d{2}(?::\d{2})?)\s*(.*)$', line)
+            # Try to match timestamp pattern
+            timestamp_match = re.search(r'(\d{1,2}:\d{1,2}(?::\d{2})?)', line)
             
-            if match:
-                timestamp, description = match.groups()
+            if timestamp_match:
+                timestamp = timestamp_match.group(1)
+                
+                # Try to get description after timestamp
+                description_match = re.search(fr'{re.escape(timestamp)}\s*[-:]?\s*(.*)', line)
+                description = description_match.group(1) if description_match else ""
                 
                 # Validate timestamp
                 if not TimestampFormatter.validate_timestamp(timestamp):
@@ -78,8 +108,9 @@ class TimestampFormatter:
                 formatted_line = f"{normalized_timestamp} - {description.strip()}"
                 formatted_lines.append(formatted_line)
             else:
-                # If no clear timestamp, add the line as-is
-                formatted_lines.append(line)
+                # If no clear timestamp, check if line contains a number that might be a timestamp
+                if re.search(r'\d+', line):
+                    formatted_lines.append(line)
         
         # Join the formatted lines into a single output
         return '\n'.join(formatted_lines)
