@@ -59,10 +59,10 @@ def is_cloud_environment():
             return True
             
     try:
-        from streamlit.web.server.websocket_headers import _get_websocket_headers
-        headers = _get_websocket_headers()
-        if headers and ('x-forwarded-host' in headers or 'fly-region' in headers):
-            return True
+        if hasattr(st, 'context') and hasattr(st.context, 'headers'):
+            headers = st.context.headers
+            if headers and ('x-forwarded-host' in headers or 'fly-region' in headers):
+                return True
     except:
         pass
     
