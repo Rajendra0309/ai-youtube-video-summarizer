@@ -7,4 +7,4 @@ youtube_transcript_api>=1.2.4
 google-generativeai>=0.8.6
 lxml>=6.0.2
 urllib3>=2.6.3
-yt-dlp>=2024.0.0
+yt-dlp>=2025.1.26

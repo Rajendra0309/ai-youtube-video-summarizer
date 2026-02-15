@@ -94,20 +94,25 @@ class Model:
 
             # 1. Download Audio to Temp File
             with tempfile.TemporaryDirectory() as tmpdirname:
+                # Prepare yt-dlp options based on available authentication
                 ydl_opts = {
                     'format': 'bestaudio/best',
                     'outtmpl': f'{tmpdirname}/%(id)s.%(ext)s',
                     'quiet': True,
                     'no_warnings': True,
-                    # Authenticate with cookies if available
-                    'cookiefile': cookie_path,
-                    # Impersonate Android client as backup
-                    'extractor_args': {
+                }
+                
+                # If we have cookies, use them and stick to the default client (Web)
+                # Mixing Web cookies with Android client often fails.
+                if cookie_path:
+                    ydl_opts['cookiefile'] = cookie_path
+                else:
+                    # No cookies = try Android client to bypass bot check
+                    ydl_opts['extractor_args'] = {
                         'youtube': {
                             'player_client': ['android', 'ios'],
                         }
                     }
-                }
                 
                 audio_path = None
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
