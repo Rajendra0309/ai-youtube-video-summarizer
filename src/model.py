@@ -77,6 +77,21 @@ class Model:
 
             genai.configure(api_key=api_key)
 
+            # Check for YouTube cookies in env var (Netscape format content)
+            cookies_content = os.getenv("YOUTUBE_COOKIES")
+            cookie_file = None
+            cookie_path = None
+            
+            if cookies_content:
+                cookie_file = tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.txt')
+                cookie_file.write(cookies_content)
+                cookie_file.flush()
+                cookie_path = cookie_file.name
+            elif os.path.exists("cookies.txt"):
+                cookie_path = "cookies.txt"
+            elif os.path.exists("/etc/secrets/cookies.txt"): # Common Render secret path
+                cookie_path = "/etc/secrets/cookies.txt"
+
             # 1. Download Audio to Temp File
             with tempfile.TemporaryDirectory() as tmpdirname:
                 ydl_opts = {
@@ -84,7 +99,9 @@ class Model:
                     'outtmpl': f'{tmpdirname}/%(id)s.%(ext)s',
                     'quiet': True,
                     'no_warnings': True,
-                    # Impersonate Android client to bypass "Sign in" bot check
+                    # Authenticate with cookies if available
+                    'cookiefile': cookie_path,
+                    # Impersonate Android client as backup
                     'extractor_args': {
                         'youtube': {
                             'player_client': ['android', 'ios'],
@@ -127,9 +144,21 @@ class Model:
                 # Cleanup remote file
                 myfile.delete()
                 
+                # Cleanup cookie file
+                if cookie_file and os.path.exists(cookie_file.name):
+                    os.unlink(cookie_file.name)
+
                 return response.text if response else None
 
         except Exception as e:
             error_msg = str(e)
             print(f"Video processing error: {error_msg}")
+            
+            # Cleanup cookie file in case of error
+            if 'cookie_file' in locals() and cookie_file and os.path.exists(cookie_file.name):
+                try:
+                    os.unlink(cookie_file.name)
+                except:
+                    pass
+                    
             return f"⚠️ Video processing error: {error_msg}"
