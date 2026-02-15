@@ -79,6 +79,38 @@ The app will open in your browser at `http://localhost:8501`.
 3. **Choose Language**: Pick your preferred output language (e.g., English, Hindi, Spanish) or let it **Auto-Detect**.
 4. **View Results**: The AI will process the video and display the results in formatted cards. You can copy the text with one click!
 
+## ☁️ Cloud Deployment (Recommended: Streamlit Community Cloud)
+
+This project is optimized and tested for **Streamlit Community Cloud**, which seamlessly handles the necessary system dependencies and secrets management. We highly recommend deploying here for the smoothest experience.
+
+### 1. Why Streamlit Cloud?
+- **Automatic System Dependencies**: It natively supports `packages.txt` to install `ffmpeg` (required for audio processing).
+- **Easy Secrets Management**: Securely handles cookies and API keys via the dashboard.
+- **Direct GitHub Integration**: Deploys instantly from your repository.
+
+### 2. Deployment Steps
+1.  **Fork this Repository** to your GitHub account.
+2.  **Sign in** to [Streamlit Community Cloud](https://share.streamlit.io/).
+3.  **New App** -> Select your repository.
+4.  **Add Secrets**: Go to **App Settings -> Secrets** and paste your credentials (API Key & Cookies) as shown below.
+5.  **Deploy!** 🚀
+
+> **Note**: While other platforms like Render or Railway can work, they often require complex Docker configurations to manage the IP blocking and dependencies. For this project, **Streamlit Cloud is the verified solution**.
+
+### 3. Handling YouTube Blocks (Crucial Step)
+If you see "Sign in to confirm you're not a bot" errors, you must provide YouTube Cookies.
+1.  **Export Cookies**: Use a browser extension (e.g., "Get cookies.txt LOCALLY") to export your YouTube cookies.
+2.  **Add to Streamlit Secrets**:
+    ```toml
+    GOOGLE_GEMINI_API_KEY = "your_api_key"
+    
+    YOUTUBE_COOKIES = """
+    # Netscape HTTP Cookie File
+    ... paste your full cookie content here ...
+    """
+    ```
+This authentication bypasses the IP block and ensures reliable summaries! 🍪
+
 ## � Project Structure
 
 ```
