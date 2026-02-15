@@ -84,7 +84,12 @@ class Model:
                     'outtmpl': f'{tmpdirname}/%(id)s.%(ext)s',
                     'quiet': True,
                     'no_warnings': True,
-                    'overwrites': True,
+                    # Impersonate Android client to bypass "Sign in" bot check
+                    'extractor_args': {
+                        'youtube': {
+                            'player_client': ['android', 'ios'],
+                        }
+                    }
                 }
                 
                 audio_path = None
