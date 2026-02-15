@@ -1,17 +1,10 @@
 class Prompt:
     @staticmethod
-    def prompt1(ID=0):
-        """
-        Generate context-specific prompts for different video content processing tasks.
-        
-        Args:
-            ID (str or int): Identifier for the specific prompt type
-            
-        Returns:
-            str: Detailed prompt text for the specified task
-        """
-        if ID == 0:  # Summary Prompt
-            prompt_text = """Comprehensive Video Summary Generation Task
+    def prompt1(ID=0, language="English"):
+        lang_instruction = f"\n\nIMPORTANT: Provide your response in {language}. If the transcript is in a different language, still provide the output in {language}."
+
+        if ID == 0:
+            prompt_text = f"""Comprehensive Video Summary Generation Task
 
 Objective: Create an engaging, insightful, and concise summary that captures the essence of the video while providing maximum value to the reader.
 
@@ -52,10 +45,10 @@ Evaluation Criteria:
     - Accuracy of content representation
     - Clarity of explanation
     - Comprehensive coverage
-    - Readability and flow"""
+    - Readability and flow{lang_instruction}"""
 
         elif ID == "timestamp":
-            prompt_text = """Timestamp Generation Task
+            prompt_text = f"""Timestamp Generation Task
 
             Guidelines:
                 1. Generate precise timestamps for key video segments
@@ -73,10 +66,10 @@ Evaluation Criteria:
             Execution Principles:
                 - Be precise
                 - Use clear, succinct language
-                - Capture the essence of each segment"""
+                - Capture the essence of each segment{lang_instruction}"""
 
         elif ID == "transcript":
-            prompt_text = """Advanced Transcript Transformation Guidelines
+            prompt_text = f"""Advanced Transcript Transformation Guidelines
 
 Comprehensive Transcript Generation Objectives:
     1. **Structural Integrity**
@@ -119,7 +112,7 @@ Comprehensive Transcript Generation Objectives:
 Special Directives:
     - Prioritize comprehensive understanding
     - Balance technical accuracy with readability
-    - Transform spoken content into an engaging document"""
+    - Transform spoken content into an engaging document{lang_instruction}"""
 
         else:
             prompt_text = "Invalid prompt request"

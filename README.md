@@ -1,63 +1,109 @@
-<h1 align="center">
-  <br>
-  <img src="https://www.freepnglogos.com/uploads/youtube-circle-icon-png-logo-14.png" alt="AI YouTube Video Summarizer" width="200">
-  <br>
-   🎥 AI Video Summarization & Timestamp Generator
-  <br>
-</h1>
+# 🎥 AI YouTube Video Summarizer
 
-<h4 align="center">Harnessing the Power of LLMs for Enhanced Video Understanding</h4>
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.28%2B-ff4b4b)
+![Gemini AI](https://img.shields.io/badge/Google-Gemini%20AI-4285F4)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-<p align="center">
-  <a href="#overview-">Overview</a> •
-  <a href="#features-">Features</a> •
-  <a href="#getting-started-">Getting Started</a> •
-  <a href="#contributing">Contributing</a> •
-  <a href="https://ai-youtube-video-summarizer.streamlit.app/" target="_blank">Live Demo</a>
-</p>
+Transform long YouTube videos into concise summaries, detailed timestamps, and accurate transcripts in seconds. Powered by Google's Gemini AI, this tool supports over 30 languages and features a premium, responsive UI.
 
+---
 
+## ✨ Key Features
 
-## Overview 📝
+- **📝 Smart Summaries**: Get concise, bullet-point summaries of any YouTube video.
+- **🕒 Automatic Timestamps**: Generate chapter-like timestamps to navigate key topics easily.
+- **📄 Full Transcripts**: Extract accurate transcripts even if the video doesn't have captions (AI-generated fallback).
+- **🌍 Multi-Language Support**: Summarize and transcribe content in **34+ languages** (English, Hindi, Spanish, French, German, and many more).
+- **🌗 Dark & Light Mode**: A beautifully crafted UI with a toggle switch for comfortable viewing in any lighting.
+- **📱 Fully Responsive**: Works perfectly on desktops, tablets, and mobile devices.
+- **⚡ High Performance**: Fast processing using optimized Gemini 2.0 Flash models.
 
-This project is an AI-powered video summarizer designed specifically for YouTube videos. Leveraging the Google Gemini API, it employs advanced machine learning techniques to analyze and condense lengthy YouTube videos into concise summaries, providing users with quick insights into the video content.
+## 🛠️ Tech Stack
 
-## Features ✨
+- **Frontend**: [Streamlit](https://streamlit.io/) (Python-based web framework)
+- **AI Model**: [Google Gemini 2.5 Flash / 2.0 Flash](https://ai.google.dev/) (Text & Video capabilities)
+- **Backend Logic**: Python
+- **APIs & Libraries**: 
+  - `google-generativeai`
+  - `youtube-transcript-api`
+  - `beautifulsoup4` (Web scraping fallback)
+  - `yt-dlp` (Advanced video data extraction)
 
-- Automatic extraction of key insights and timestamps from YouTube videos.
-- Utilizes youtube-transcript-api for getting the transcripts/subtitles YouTube video.
-- Option for users to select AI models like *ChatGPT* or *Gemini* for summarization.
-- Efficiently summarizes videos, reducing viewing time while preserving essential information.
+## 🚀 Installation & Setup
 
-## Getting Started 🚀
+Follow these steps to run the project locally:
 
-### Prerequisites
-
-- Python 3.10
-- LLM Model API Keys [[🔑]](#get-api-keys)
-
-### Usage
-
-1. Clone the repository:
-git clone https://github.com/Rajendra0309/ai-youtube-video-summarizer.git
-2. Navigate to the project directory:
+### 1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/ai-youtube-video-summarizer.git
 cd ai-youtube-video-summarizer
-3. Install dependencies:
+```
+
+### 2. Create a Virtual Environment (Recommended)
+```bash
+python -m venv venv
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+```bash
 pip install -r requirements.txt
-4. Create a ".env" file ⬇️ [add whichever is available]
-GOOGLE_GEMINI_API_KEY = "Your-Gemini-Key-Here"
+```
 
-### Get API Key:
+### 4. Set Up API Key
+1. Get your free API key from [Google AI Studio](https://aistudio.google.com/apikey).
+2. Create a `.env` file by copying the example:
+```bash
+cp .env.example .env
+# Windows: copy .env.example .env
+```
+3. Open `.env` and paste your API key:
+```env
+GOOGLE_GEMINI_API_KEY=your_actual_api_key_here
+```
 
-- [Google Gemini API key](https://makersuite.google.com/app/apikey) 🔑 
-   
-5. Run the summarizer:
+### 5. Run the Application
+```bash
 streamlit run app.py
+```
+The app will open in your browser at `http://localhost:8501`.
 
-## Contributing
+## 📖 Usage Guide
 
-Contributions are welcome from the community! Whether it's feedback, suggestions, or code improvements, your input is valuable. 
+1. **Paste URL**: Copy any YouTube video link and paste it into the input field.
+2. **Select Mode**: Choose between **Summary**, **Timestamps**, or **Transcript**.
+3. **Choose Language**: Pick your preferred output language (e.g., English, Hindi, Spanish) or let it **Auto-Detect**.
+4. **View Results**: The AI will process the video and display the results in formatted cards. You can copy the text with one click!
 
-## Acknowledgments
+## � Project Structure
 
-- [Google Gemini](https://ai.google.dev/)
+```
+ai-youtube-video-summarizer/
+├── src/
+│   ├── model.py          # Gemini AI model integration
+│   ├── prompt.py         # Prompt engineering templates
+│   ├── video_info.py     # YouTube transcript & metadata extraction
+│   └── timestamp_formatter.py # Formatting logic for timestamps
+├── app.py                # Main Streamlit application
+├── requirements.txt      # Python dependencies
+├── .env                  # Environment variables (API Key)
+└── README.md             # Project documentation
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
