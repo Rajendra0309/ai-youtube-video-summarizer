@@ -165,5 +165,7 @@ class Model:
                     os.unlink(cookie_file.name)
                 except:
                     pass
-                    
-            return f"⚠️ Video processing error: {error_msg}"
+            
+            # Add debug info to error message
+            debug_info = f"[Cookie Path: {cookie_path}]" if 'cookie_path' in locals() else "[Cookie Path: None]"
+            return f"⚠️ Video processing error: {debug_info} {error_msg}"
