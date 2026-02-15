@@ -59,48 +59,71 @@ class Model:
 
     @staticmethod
     def google_gemini_video(video_url, prompt):
+        """
+        Robust fallback: Downloads audio via yt-dlp, uploads to Gemini File API, 
+        and generates content. Bypasses YouTube transcript blocks on cloud IPs.
+        """
+        import google.generativeai as genai
+        import tempfile
+        import time
+        from pathlib import Path
+        import yt_dlp
+
         try:
             load_dotenv()
             api_key = os.getenv("GOOGLE_GEMINI_API_KEY")
-
             if not api_key:
-                return "⚠️ Missing Gemini API key. Please add your API key to the .env file."
+                return "⚠️ Missing Gemini API key."
 
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-            headers = {"Content-Type": "application/json"}
+            genai.configure(api_key=api_key)
 
-            data = {
-                "contents": [{
-                    "parts": [
-                        {
-                            "fileData": {
-                                "mimeType": "video/mp4",
-                                "fileUri": video_url
-                            }
-                        },
-                        {"text": prompt}
-                    ]
-                }],
-                "generationConfig": {
-                    "temperature": 0.3,
-                    "topK": 20,
-                    "topP": 0.9,
-                    "maxOutputTokens": 8192,
+            # 1. Download Audio to Temp File
+            with tempfile.TemporaryDirectory() as tmpdirname:
+                ydl_opts = {
+                    'format': 'bestaudio/best',
+                    'outtmpl': f'{tmpdirname}/%(id)s.%(ext)s',
+                    'quiet': True,
+                    'no_warnings': True,
+                    'overwrites': True,
                 }
-            }
+                
+                audio_path = None
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    info = ydl.extract_info(video_url, download=True)
+                    audio_path = ydl.prepare_filename(info)
 
-            response = requests.post(url, headers=headers, data=json.dumps(data), timeout=90)
+                if not audio_path or not os.path.exists(audio_path):
+                    return None
 
-            if response.status_code == 200:
-                result = response.json()
-                if "candidates" in result and len(result["candidates"]) > 0:
-                    if "content" in result["candidates"][0] and "parts" in result["candidates"][0]["content"]:
-                        parts = result["candidates"][0]["content"]["parts"]
-                        texts = [part.get("text", "") for part in parts if "text" in part]
-                        return "\n".join(texts)
-                return None
-            else:
-                return None
+                # 2. Upload to Gemini
+                # Let Gemini infer MIME type from extension (e.g., .m4a, .webm)
+                myfile = genai.upload_file(audio_path)
+                
+                # Wait for processing
+                while myfile.state.name == "PROCESSING":
+                    time.sleep(2)
+                    myfile = genai.get_file(myfile.name)
 
-        except Exception:
+                if myfile.state.name == "FAILED":
+                    return None
+
+                # 3. Generate Content
+                model = genai.GenerativeModel("gemini-2.0-flash")
+                response = model.generate_content(
+                    [myfile, prompt],
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.3,
+                        top_p=0.9,
+                        top_k=20,
+                        max_output_tokens=8192
+                    )
+                )
+                
+                # Cleanup remote file
+                myfile.delete()
+                
+                return response.text if response else None
+
+        except Exception as e:
+            print(f"Video processing error: {e}")
             return None
