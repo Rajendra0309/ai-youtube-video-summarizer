@@ -113,19 +113,20 @@ class Model:
                         cookie_debug = f"Path: {cookie_path}, Error reading size"
 
                 # If we have cookies, use them. 
-                # Try 'tv' client (Smart TV) which is often less strict about IP blocks
+                # Try standard 'web' client with specific User-Agent
                 if cookie_path:
                     ydl_opts['cookiefile'] = cookie_path
+                    ydl_opts['user_agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
                     ydl_opts['extractor_args'] = {
                         'youtube': {
-                            'player_client': ['tv'],
+                            'player_client': ['web'],
                         }
                     }
                 else:
-                    # No cookies = try TV client to bypass bot check
+                    # No cookies = try Android client to bypass bot check
                     ydl_opts['extractor_args'] = {
                         'youtube': {
-                            'player_client': ['tv'],
+                            'player_client': ['android', 'ios'],
                         }
                     }
                 
