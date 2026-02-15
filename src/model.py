@@ -125,5 +125,6 @@ class Model:
                 return response.text if response else None
 
         except Exception as e:
-            print(f"Video processing error: {e}")
-            return None
+            error_msg = str(e)
+            print(f"Video processing error: {error_msg}")
+            return f"⚠️ Video processing error: {error_msg}"

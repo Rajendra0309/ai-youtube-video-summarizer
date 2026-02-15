@@ -692,8 +692,13 @@ class AIVideoSummarizer:
                 if not result or (isinstance(result, str) and result.startswith("⚠️")):
                     video_url = f"https://www.youtube.com/watch?v={self.video_id}"
                     video_result = Model.google_gemini_video(video_url, prompt)
-                    if video_result and not (isinstance(video_result, str) and video_result.startswith("⚠️")):
-                        result = video_result
+                    if video_result:
+                        # If video result is valid, use it
+                        if not (isinstance(video_result, str) and video_result.startswith("⚠️")):
+                            result = video_result
+                        # If video result is an error and we don't have a result yet, show the error
+                        elif not result:
+                            result = video_result
 
                 if not result:
                     st.error("😔 Could not generate summary. Please check your Gemini API key and try again.")
@@ -737,8 +742,13 @@ class AIVideoSummarizer:
                 if not result or (isinstance(result, str) and result.startswith("⚠️")):
                     video_url = f"https://www.youtube.com/watch?v={self.video_id}"
                     video_result = Model.google_gemini_video(video_url, timestamp_prompt)
-                    if video_result and not (isinstance(video_result, str) and video_result.startswith("⚠️")):
-                        result = video_result
+                    if video_result:
+                        # If video result is valid, use it
+                        if not (isinstance(video_result, str) and video_result.startswith("⚠️")):
+                            result = video_result
+                        # If video result is an error and we don't have a result yet, show the error
+                        elif not result:
+                            result = video_result
 
                 if not result:
                     st.error("😔 Could not generate timestamps. Please check your Gemini API key and try again.")
