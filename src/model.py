@@ -102,10 +102,25 @@ class Model:
                     'no_warnings': True,
                 }
                 
-                # If we have cookies, use them and stick to the default client (Web)
-                # Mixing Web cookies with Android client often fails.
+                
+                # Check cookie file size/validity
+                cookie_debug = "No Cookie File"
+                if cookie_path:
+                    try:
+                        size = os.path.getsize(cookie_path)
+                        cookie_debug = f"Path: {cookie_path}, Size: {size} bytes"
+                    except:
+                        cookie_debug = f"Path: {cookie_path}, Error reading size"
+
+                # If we have cookies, use them. 
+                # Try 'ios' client + cookies which often works better than 'web' on data centers
                 if cookie_path:
                     ydl_opts['cookiefile'] = cookie_path
+                    ydl_opts['extractor_args'] = {
+                        'youtube': {
+                            'player_client': ['ios', 'web'],
+                        }
+                    }
                 else:
                     # No cookies = try Android client to bypass bot check
                     ydl_opts['extractor_args'] = {
@@ -167,5 +182,6 @@ class Model:
                     pass
             
             # Add debug info to error message
-            debug_info = f"[Cookie Path: {cookie_path}]" if 'cookie_path' in locals() else "[Cookie Path: None]"
-            return f"⚠️ Video processing error: {debug_info} {error_msg}"
+            # cookie_debug variable is set earlier
+            final_debug = cookie_debug if 'cookie_debug' in locals() else f"[Cookie Path: {cookie_path if 'cookie_path' in locals() else 'None'}]"
+            return f"⚠️ Video processing error: [{final_debug}] {error_msg}"
